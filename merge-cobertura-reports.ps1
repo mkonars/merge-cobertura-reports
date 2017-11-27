@@ -114,12 +114,16 @@ foreach ($fileObject in $files) {
 
 	[xml]$xmlDocument = Get-Content $file
 	
-	$sourceNode = $mergedDocument.ImportNode($xmlDocument.SelectSingleNode("coverage/sources/source"), $true)
-	$packageNode = $mergedDocument.ImportNode($xmlDocument.SelectSingleNode("coverage/packages/package"), $true)
-	
-	[void]$mergedDocument.selectSingleNode("coverage/sources").appendChild($sourceNode)
-	[void]$mergedDocument.selectSingleNode("coverage/packages").appendChild($packageNode)
+	foreach($node in $xmlDocument.SelectNodes("coverage/sources/source")) {
+		$newNode = $mergedDocument.ImportNode($node, $true);
+		[void]$mergedDocument.selectSingleNode("coverage/sources").appendChild($newNode)
+	}
 
+	foreach($node in $xmlDocument.SelectNodes("coverage/packages/package")) {
+		$newNode = $mergedDocument.ImportNode($node, $true);
+		[void]$mergedDocument.selectSingleNode("coverage/packages").appendChild($newNode)
+	}
+	
 	foreach($property in $properties) {
 		[string]$propertyValue = Select-Xml "/coverage/@$property" $xmlDocument
 		if($debug) {
